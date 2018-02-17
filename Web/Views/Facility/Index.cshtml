@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "Facilities";
+}
+<div class="tray_main">
+    <div class="panel panel-primary js-panel-dt mb0">
+        <div class="panel-heading">
+            @ViewBag.Title
+            <button type="button" class="btn btn-xs btn-info pull-right mb0 ml10 t-left t-sm t-alt" data-tooltip="Add Facility" id="addBtn">
+                <i class="fa fa-plus"></i>
+            </button>
+            <button type="button" data-toggle="collapse" data-target="#facilityFilters" aria-expanded="false" aria-controls="facilityFilters" class="btn btn-xs btn-warning pull-right mb0 ml10 t-left t-md t-alt" data-tooltip="Show / Hide Filters">
+                <i class="fa fa-filter"></i>
+            </button>
+            <div class="panel-information collapse" id="facilityFilters">
+                <div class="pt10 pl15 pr15">
+                    <div class="row">
+                        <div class="col-lg-2 col-md-3 col-sm-6">
+                            <label class="control-label">Status</label>
+                            <select id="activeFilter" class="form-control input-sm">
+                                <option value="null">All</option>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-body p0">
+            <table class="stripe order-column" id="FacilityTable">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Landmark</th>
+                        <th>Address</th>
+                        <th>Address2</th>
+                        <th>City</th>
+                        <th>State</th>
+                        <th>ZipCode</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script type="text/javascript">
+    var facilityTable;
+    $(document).ready(function () {
+
+
+        DataTableHandler.handleDataTableDefaults();
+
+        facilityTable = $("#FacilityTable").DataTable({
+            "serverSide": true,
+            "language": {
+                emptyTable: "No Content to Display",
+                search: "_INPUT_",
+                searchPlaceholder: "Search"
+            },
+            "ajax": {
+                "type": "POST",
+                "contentType": 'application/json; charset=utf-8',
+                "url": '@Url.Action("FacilityTable")',
+                "data": function(data) {
+                    data.activeFilter = $('#activeFilter').val();
+                    return data = JSON.stringify(data);
+                }
+
+            },
+            "dom": "<'dt-head clearfix'lrf>t",
+            "scrollY": DataTableHandler.generateDtHeight(),
+            "columns": [
+                { "data": "Id", "visible": false , "orderable" : false },
+                { "data": "Name", "orderable": true },
+                { "data": "Landmark", "orderable": true },
+                { "data": "Address", "orderable": true },
+                { "data": "Address2", "orderable": true },
+                { "data": "City", "orderable": true},
+                { "data": "State", "orderable": true},
+                { "data": "ZipCode", "orderable": true},
+                {
+                    className: 'icon-width',
+                    render: function () {
+                        return '<span class="edit t-left t-xs" data-tooltip="Edit"><i class="fa fa-pencil"></i></span>';
+                    }
+                }
+            ],
+            "order": [6, "asc"]
+        });
+
+        DataTableHandler.currentTable.setTable($("#FacilityTable"));
+
+
+        $("#FacilityTable").on('click',
+            '.edit',
+            function(e) {
+                e.preventDefault();
+                var rowData = facilityTable.row($(this).closest('tr')).data();
+                $.ajax({
+                    method: "Get",
+                    url: '@Url.Action("GetUnitForm")',
+                    data: { id: rowData.Id },
+                    success: function(html) {
+                        $("#genericFormModalTitle").empty();
+                        $("#genericFormModalTitle").html("Edit Facility");
+                        $("#genericModalBody").empty();
+                        $("#genericModalBody").append(html);
+                        $("#genericFormModalTemplate").modal('show');
+                    }
+                });
+            });
+
+        $(document).on("dblclick",
+            '#FacilityTable tbody tr',
+            function (e) {
+                e.preventDefault();
+
+                var rowData = facilityTable.row($(this).closest('tr')).data();
+                $.ajax({
+                    method: "Get",
+                    url: '@Url.Action("GetUnitForm")',
+                    data: { id: rowData.Id },
+                    success: function(html) {
+                        $("#genericFormModalTitle").empty();
+                        $("#genericFormModalTitle").html("Edit Facility");
+                        $("#genericModalBody").empty();
+                        $("#genericModalBody").append(html);
+                        $("#genericFormModalTemplate").modal('show');
+                    }
+                });
+            });
+
+        $("#addBtn").on('click', function () {
+            $.ajax({
+                method: "Get",
+                url: '@Url.Action("GetUnitForm")',
+                dataType: 'html',
+                success: function (html) {
+                    $("#genericFormModalTitle").empty();
+                    $("#genericFormModalTitle").html("Add Facility");
+                    $("#genericModalBody").empty();
+                    $("#genericModalBody").append(html);
+                    $("#genericFormModalTemplate").modal('show');
+                }
+            });
+        });
+
+
+        $("#activeFilter").on('change',
+            function() {
+                facilityTable.ajax.reload();
+            });
+       });
+    </script>
+}

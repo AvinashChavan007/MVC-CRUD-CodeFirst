@@ -1,0 +1,91 @@
+﻿@model Web.ViewModels.FacilityViewModel
+@{
+    Layout = null;
+}
+@using (Html.BeginForm("SaveFacility", "Facility", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            @Html.ValidationSummary("", new { @class = "text-danger" })
+        </div>
+    }
+    @Html.HiddenFor(m => m.Id, Model.Id)
+
+    <div class="row">
+        <div class="col-sm-6">
+            @Html.LabelFor(m => m.Name)
+            @Html.TextBoxFor(m => m.Name, Model.Name, new { @class = "form-control" })
+        </div>
+        <div class="col-sm-6">
+            @Html.LabelFor(m => m.Landmark)
+            @Html.TextBoxFor(m => m.Landmark, Model.Landmark, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            @Html.LabelFor(m => m.Address)
+            @Html.TextBoxFor(m => m.Address, Model.Address, new { @class = "form-control" })
+        </div>
+        <div class="col-sm-6">
+            @Html.LabelFor(m => m.Address2)
+            @Html.TextBoxFor(m => m.Address2, Model.Address2, new { @class = "form-control" })
+        </div>
+        <div class="col-sm-6">
+            @Html.LabelFor(m => m.City)
+            @Html.TextBoxFor(m => m.City, Model.City, new { @class = "form-control" })
+        </div>
+        <div class="col-sm-6">
+            @Html.LabelFor(m => m.State)
+            @Html.TextBoxFor(m => m.State, Model.State, new { @class = "form-control" })
+        </div>
+        <div class="col-sm-6">
+            @Html.LabelFor(m => m.ZipCode)
+            @Html.TextBoxFor(m => m.ZipCode, Model.ZipCode, new { @class = "form-control" })
+        </div>
+    </div>
+
+    if (Model.Id == 0)
+    {
+        @Html.HiddenFor(m => m.IsActive)
+    }
+    else
+    {
+        @Html.LabelFor(m => m.IsActive)<br />
+        <div class="fancy-checkbox mt10 mb20">
+            @Html.CheckBoxFor(m => m.IsActive)
+            <label for="IsActive" class="box"></label>
+        </div>
+    }
+
+    <div class="modal-footer">
+        <input id="genericFormModalSave" type="submit" value="Save" class="btn btn-success pull-right" />
+    </div>
+}
+<script type="text/javascript">
+    $("form").submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: this.method,
+            url: this.action,
+            data: $(this).serialize(),
+            success: function (result) {
+                if (result.reload === false) {
+                    $("#genericModalBody").empty();
+                    $("#genericModalBody").html(result.partialViewData);
+                } else {
+                    $("#genericFormModalTemplate").modal('hide');
+                    toastr.success("Facility Saved");
+                    window.facilityTable.ajax.reload();
+                }
+            }
+        }).fail(function () {
+            toastr.error("Something went wrong!");
+            if ($('#Id').val() === 0){
+                window.facilityTable.ajax.reload();
+            }
+            });
+
+    });
+</script>
