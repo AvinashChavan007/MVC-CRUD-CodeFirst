@@ -1,19 +1,3 @@
-﻿$.ajaxSetup({ cache: false });
-
-function InitTables(){
-    agGrid.LicenseManager.setLicenseKey("ag-Grid_Evaluation_License_Key_Not_for_Production_100Devs15_February_2018__MTUxODY1MjgwMDAwMA==600d5a723b746ad55afff76eb446f0ad");
-                                         
-};
-
-// custom ag-grid cell renderers
-// params needs to be the cellRendererParams used for that column
-// icon: the type of icon to show (i.e: fa fa-pencil).
-// type: the type of icon this is - used for the class.
-// value: automatically from ag-grid. The value of the current cell.
-function agIconCellRender(params) {
-    return '<span class="' + params.type + ' t-left t-xs" data-tooltip="Edit" data-id="' + params.value + '"><i class="' + params.icon + '"></i></span>';
-}
-
 var DataTableHandler = {
     currentTable: {
         table: null,
